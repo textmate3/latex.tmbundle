@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby18 -s
+#!/usr/bin/env ruby -s
 $: << ENV['TM_SUPPORT_PATH'] + '/lib'
 require 'escape'
 def esc(str)

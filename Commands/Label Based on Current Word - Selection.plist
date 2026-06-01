@@ -7,7 +7,7 @@
 	<key>captureFormatString</key>
 	<string>$3</string>
 	<key>command</key>
-	<string>#!/usr/bin/env ruby18
+	<string>#!/usr/bin/env ruby
 
 # -- Imports -------------------------------------------------------------------
 
