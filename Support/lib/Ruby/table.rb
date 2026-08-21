@@ -2,7 +2,7 @@
 
 require ENV['TM_SUPPORT_PATH'] + '/lib/escape'
 require ENV['TM_SUPPORT_PATH'] + '/lib/exit_codes'
-require ENV['TM_SUPPORT_PATH'] + '/lib/osx/plist'
+require ENV['TM_SUPPORT_PATH'] + '/private/plist'
 require ENV['TM_BUNDLE_SUPPORT'] + '/lib/Ruby/indent'
 
 # -- Class ---------------------------------------------------------------------
@@ -162,7 +162,7 @@ class Table
                       '  latexTableTabular = 1; }')
       nib = e_sh(ENV['TM_BUNDLE_SUPPORT']) + '/nibs/CreateTable'
       result_plist = `#{dialog} -d #{defaults} -cm #{nib}`
-      values = OSX::PropertyList.load(result_plist)['result']
+      values = Plist.load(result_plist)['result']
       TextMate.exit_discard if values.nil?
       parse_parameters_ui(values['rows'], values['columns'],
                           values['returnArgument'])

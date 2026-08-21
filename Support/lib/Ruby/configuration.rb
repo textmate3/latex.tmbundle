@@ -1,6 +1,6 @@
 # -- Imports -------------------------------------------------------------------
 
-require ENV['TM_SUPPORT_PATH'] + '/lib/osx/plist'
+require ENV['TM_SUPPORT_PATH'] + '/private/plist'
 
 # -- Class ---------------------------------------------------------------------
 
@@ -26,7 +26,7 @@ module Configuration
       return nil unless FileTest.exist?(filename)
 
       File.open(filename) do |f|
-        plist = OSX::PropertyList.load(f)
+        plist = Plist.load(f)
         return plist
       end
     end
