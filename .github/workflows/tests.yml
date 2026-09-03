@@ -83,6 +83,7 @@ jobs:
           latexmk -latex -interaction=nonstopmode makeglossaries.tex > /dev/null 2>&1 || true
           grep -n -A2 '^!' *.log || echo 'no TeX errors logged'
           echo '=== the glossaries command as the test runs it ==='
-          cd ../Prysk/Python && source ../../lib/setup_cram.sh && cd ../../TeX
+          export TESTDIR="$PWD/../Prysk/Python"
+          source ../lib/setup_cram.sh
           export TM_FILEPATH=makeglossaries.tex
           texmate.py -suppressview latex -latexmk yes -engine latex 2>&1 | tail -40 || true
