@@ -1,0 +1,63 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+
+# What runs here: the grammar test, the Python command tests, the Ruby clean
+# utility tests and the Perl tests. Not run: latex_watch.t, which needs a
+# running TextMate to talk to, and view.t, which needs a PDF viewer.
+jobs:
+  tests:
+    runs-on: macos-26
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v7
+
+      # capnp for gtm, from the application's own Brewfile so the two stay in
+      # step, and BasicTeX for everything that typesets.
+      - name: Homebrew dependencies
+        run: |
+          curl -fsSL https://raw.githubusercontent.com/textmate3/textmate/main/Brewfile | brew bundle --file=-
+          brew install --cask basictex
+
+      - name: TeX packages
+        run: |
+          eval "$(/usr/libexec/path_helper)"
+          sudo tlmgr update --self
+          sudo tlmgr install biber biblatex csquotes ctablestack datatool framed glossaries latexmk logreq luacode mfirstuc substr supertabular texdoc texdoctk upmethodology xfor xstring
+
+      # gtm, the grammar test tool, from the application repository's gtm prerelease.
+      - name: gtm
+        run: |
+          mkdir -p "$HOME/bin"
+          gh release download gtm -R textmate3/textmate --pattern gtm --output "$HOME/bin/gtm"
+          chmod +x "$HOME/bin/gtm"
+          echo "$HOME/bin" >> "$GITHUB_PATH"
+
+      # The tests read the shared library and eight other bundles' grammars from
+      # the managed bundles directory, under the display names TextMate gives them.
+      - name: Bundles the tests read
+        run: |
+          dir="$HOME/Library/Application Support/TextMate/Managed/Bundles"
+          mkdir -p "$dir"
+          git clone -q --recurse-submodules https://github.com/textmate3/bundle-support.tmbundle "$dir/Bundle Support.tmbundle"
+          for pair in css:CSS html:HTML java:Java javascript:JavaScript javadoc:JavaDoc python:Python r:R sql:SQL; do
+            git clone -q "https://github.com/textmate3/${pair%%:*}.tmbundle" "$dir/${pair##*:}.tmbundle"
+          done
+
+      # The bundle's commands run on /usr/bin/python3 and need PyObjC there, and
+      # prysk runs the .t files.
+      - name: Python packages
+        run: /usr/bin/pip3 install --user prysk pyobjc
+
+      - name: Prysk tests
+        run: |
+          eval "$(/usr/libexec/path_helper)"
+          (cd Tests/Prysk/General && /usr/bin/python3 -m prysk grammar.t)
+          (cd Tests/Prysk/Python && /usr/bin/python3 -m prysk $(ls *.t | grep -v '^view.t$'))
+          (cd Tests/Prysk/Ruby/clean && /usr/bin/python3 -m prysk *.t)
+
+      - name: Perl tests
+        run: perl Tests/Perl/latex.t
