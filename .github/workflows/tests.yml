@@ -56,7 +56,7 @@ jobs:
         run: |
           eval "$(/usr/libexec/path_helper)"
           (cd Tests/Prysk/General && /usr/bin/python3 -m prysk grammar.t)
-          (cd Tests/Prysk/Python && /usr/bin/python3 -m prysk $(ls *.t | grep -v '^view.t$'))
+          (cd Tests/Prysk/Python && files=() && for t in *.t; do [[ "$t" == view.t ]] || files+=("$t"); done && /usr/bin/python3 -m prysk "${files[@]}")
           (cd Tests/Prysk/Ruby/clean && /usr/bin/python3 -m prysk *.t)
 
       - name: Perl tests
