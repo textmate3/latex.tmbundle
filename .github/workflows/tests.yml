@@ -71,8 +71,15 @@ jobs:
       - name: Perl tests
         run: perl Tests/Perl/latex.t
 
-      # Prysk shows only the diff of a test's transcript. When typesetting fails,
-      # the reason is in the TeX log, so surface those lines.
+      # Prysk shows only the diff of a test's transcript, and the tests clean their
+      # logs away. When a test fails, typeset the fixtures that fail most often
+      # directly and show the TeX errors.
       - name: TeX errors, when a test failed
         if: failure()
-        run: grep -n '^!' Tests/TeX/*.log || echo 'no TeX errors logged'
+        run: |
+          eval "$(/usr/libexec/path_helper)"
+          cd Tests/TeX
+          xelatex -interaction=nonstopmode xelatex.tex > /dev/null 2>&1 || true
+          latexmk -latex -interaction=nonstopmode makeglossaries.tex > /dev/null 2>&1 || true
+          grep -n -A2 '^!' *.log || echo 'no TeX errors logged'
+          which makeglossaries xindy makeindex latex xelatex || true
