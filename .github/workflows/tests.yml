@@ -16,11 +16,13 @@ jobs:
       - uses: actions/checkout@v7
 
       # capnp for gtm, from the application's own Brewfile so the two stay in
-      # step, and BasicTeX for everything that typesets.
+      # step, BasicTeX for everything that typesets, and Ghostscript for the
+      # PostScript to PDF step the latex engine path goes through.
       - name: Homebrew dependencies
         run: |
           curl -fsSL https://raw.githubusercontent.com/textmate3/textmate/main/Brewfile | brew bundle --file=-
           brew install --cask basictex
+          brew install ghostscript
 
       - name: TeX packages
         run: |
