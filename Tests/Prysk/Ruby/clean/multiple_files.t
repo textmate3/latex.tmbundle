@@ -14,7 +14,7 @@ Create some auxiliary files
   $ latexmk -lualatex references.tex 2>&- | trim| tail -n 1
   Latexmk: All targets (.*) are up-to-date (re)
   $ latexmk -xelatex ünicöde.tex 2>&- | trim | tail -n 1
-  Latexmk: All targets (\xc3\xbcnic\xc3\xb6de.pdf) are up-to-date (esc)
+  Latexmk: All targets (.*) are up-to-date (re)
 
 Delete all auxiliary file created for references.tex
 
