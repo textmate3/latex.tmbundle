@@ -26,7 +26,7 @@ jobs:
         run: |
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
-          sudo tlmgr install biber biblatex csquotes ctablestack datatool framed glossaries latexmk logreq luacode mfirstuc polyglossia substr supertabular texdoc texdoctk upmethodology xfor xltxtra xstring
+          sudo tlmgr install biber biblatex csquotes ctablestack datatool framed glossaries latexmk logreq luacode metalogo mfirstuc polyglossia realscripts substr supertabular texdoc texdoctk upmethodology xfor xltxtra xstring
 
       # gtm, the grammar test tool, from the application repository's gtm prerelease.
       - name: gtm
@@ -82,4 +82,7 @@ jobs:
           xelatex -interaction=nonstopmode xelatex.tex > /dev/null 2>&1 || true
           latexmk -latex -interaction=nonstopmode makeglossaries.tex > /dev/null 2>&1 || true
           grep -n -A2 '^!' *.log || echo 'no TeX errors logged'
-          which makeglossaries xindy makeindex latex xelatex || true
+          echo '=== the glossaries command as the test runs it ==='
+          cd ../Prysk/Python && source ../../lib/setup_cram.sh && cd ../../TeX
+          export TM_FILEPATH=makeglossaries.tex
+          texmate.py -suppressview latex -latexmk yes -engine latex 2>&1 | tail -40 || true
