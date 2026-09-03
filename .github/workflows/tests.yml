@@ -26,7 +26,7 @@ jobs:
         run: |
           eval "$(/usr/libexec/path_helper)"
           sudo tlmgr update --self
-          sudo tlmgr install biber biblatex csquotes ctablestack datatool framed glossaries latexmk logreq luacode mfirstuc substr supertabular texdoc texdoctk upmethodology xfor xstring
+          sudo tlmgr install biber biblatex csquotes ctablestack datatool framed glossaries latexmk logreq luacode mfirstuc polyglossia substr supertabular texdoc texdoctk upmethodology xfor xltxtra xstring
 
       # gtm, the grammar test tool, from the application repository's gtm prerelease.
       - name: gtm
@@ -47,6 +47,15 @@ jobs:
             git clone -q "https://github.com/textmate3/${pair%%:*}.tmbundle" "$dir/${pair##*:}.tmbundle"
           done
 
+      # The typesetting commands mark error lines in the editor through mate, at
+      # the path Tests/lib/setup_cram.sh hardcodes. There is no editor here, so
+      # that path gets a mate that accepts everything and does nothing.
+      - name: A mate that does nothing
+        run: |
+          sudo mkdir -p /Applications/TextMate.app/Contents/MacOS
+          printf '#!/bin/sh\nexit 0\n' | sudo tee /Applications/TextMate.app/Contents/MacOS/mate > /dev/null
+          sudo chmod +x /Applications/TextMate.app/Contents/MacOS/mate
+
       # The bundle's commands run on /usr/bin/python3 and need PyObjC there, and
       # prysk runs the .t files.
       - name: Python packages
@@ -61,3 +70,9 @@ jobs:
 
       - name: Perl tests
         run: perl Tests/Perl/latex.t
+
+      # Prysk shows only the diff of a test's transcript. When typesetting fails,
+      # the reason is in the TeX log, so surface those lines.
+      - name: TeX errors, when a test failed
+        if: failure()
+        run: grep -n '^!' Tests/TeX/*.log || echo 'no TeX errors logged'
