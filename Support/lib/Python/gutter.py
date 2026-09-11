@@ -10,7 +10,7 @@ from io import open
 from os import getenv
 from os.path import normpath, realpath
 from pickle import load, dump
-from pipes import quote as shellquote
+from shlex import quote as shellquote
 from subprocess import call
 
 # -- Functions ----------------------------------------------------------------

@@ -13,7 +13,7 @@ from __future__ import unicode_literals
 from io import open
 from os import chdir, getenv, EX_OSFILE  # noqa
 from os.path import basename, dirname, isfile, join, normpath, realpath
-from pipes import quote as shellquote
+from shlex import quote as shellquote
 from re import compile
 from subprocess import Popen, PIPE
 from sys import exit, stdout

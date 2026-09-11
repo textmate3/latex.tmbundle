@@ -1,4 +1,4 @@
-#!/usr/bin/env -S "${TM_BUNDLE_SUPPORT}/bin/python"
+#!/usr/bin/env python3
 # encoding: utf-8
 
 # -----------------------------------------------------------------------------
@@ -48,7 +48,7 @@ from os import chdir, getenv, putenv, remove
 from os.path import (basename, dirname, exists, getmtime, isfile, normpath,
                      realpath, splitext)
 from pickle import load, dump
-from pipes import quote as shellquote
+from shlex import quote as shellquote
 from re import match, search
 from subprocess import (call, CalledProcessError, check_output, Popen, PIPE,
                         STDOUT)
