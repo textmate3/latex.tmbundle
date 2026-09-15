@@ -1,10 +1,8 @@
 # -- Imports ------------------------------------------------------------------
 
-from __future__ import print_function
-from __future__ import unicode_literals
-
-from Foundation import CFPreferencesAppSynchronize, CFPreferencesCopyAppValue
 from os import getenv
+from plistlib import loads
+from subprocess import run
 
 # -- Class --------------------------------------------------------------------
 
@@ -14,6 +12,13 @@ class Preferences(object):
 
     This class reads the LaTeX preferences and provides a dictionary-like
     interface to process them.
+
+    The values come from `defaults export`, which is the command line face of
+    the same preferences database CFPreferences reads. It used to come from
+    CFPreferences directly through PyObjC, which meant every LaTeX command in
+    this bundle needed a Python with PyObjC installed into it, and the bundle
+    told people to get one by running pip against Apple's Python, which macOS
+    refuses. Nothing here needs a Python extension.
 
     """
 
@@ -31,7 +36,6 @@ class Preferences(object):
 
         """
         tm_identifier = getenv('TM_APP_IDENTIFIER', 'com.macromates.textmate')
-        CFPreferencesAppSynchronize(tm_identifier)
 
         self.default_values = {
             'latexAutoView': True,
@@ -45,10 +49,31 @@ class Preferences(object):
         }
         self.prefs = self.default_values.copy()
 
-        for key in self.prefs:
-            preference_value = CFPreferencesCopyAppValue(key, tm_identifier)
-            if preference_value is not None:
-                self.prefs[key] = preference_value
+        for key, value in self.read_defaults(tm_identifier).items():
+            if key not in self.prefs:
+                continue
+            # The database stores booleans as booleans, but a value a person
+            # set with `defaults write -int` arrives as a number, so anything
+            # standing in for a boolean is read as one.
+            self.prefs[key] = (bool(value) if isinstance(self.default_values[key], bool)
+                               else value)
+
+    @staticmethod
+    def read_defaults(domain):
+        """Return the whole preferences domain as a dictionary.
+
+        An empty dictionary when the domain does not exist yet, which is the
+        normal case on a machine where nothing has been changed.
+
+        """
+        result = run(['defaults', 'export', domain, '-'],
+                     capture_output=True, check=False)
+        if result.returncode != 0 or not result.stdout:
+            return {}
+        try:
+            return loads(result.stdout)
+        except Exception:
+            return {}
 
     def __getitem__(self, key):
         """Return a value stored inside Preferences.

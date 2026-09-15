@@ -1,4 +1,4 @@
-#!/usr/bin/env -S "${TM_BUNDLE_SUPPORT}/bin/python"
+#!/usr/bin/env python3
 # coding=utf8
 
 # -- Imports ------------------------------------------------------------------

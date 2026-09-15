@@ -1,4 +1,4 @@
-#!/usr/bin/env -S "${TM_BUNDLE_SUPPORT}/bin/python"
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
 # -----------------------------------------------------------------------------
@@ -47,7 +47,7 @@ from io import open
 from os import chdir, getenv, mkdir
 from os.path import basename, exists, expanduser, getmtime, splitext
 from pickle import load, dump
-from pipes import quote as shellquote
+from shlex import quote as shellquote
 from subprocess import check_output
 try:
     from urllib.parse import quote  # Python 3

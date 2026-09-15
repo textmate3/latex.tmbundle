@@ -8,7 +8,7 @@ from __future__ import unicode_literals
 
 from os import getenv
 from os.path import join
-from pipes import quote
+from shlex import quote
 from subprocess import check_output
 
 # -- Functions ----------------------------------------------------------------
